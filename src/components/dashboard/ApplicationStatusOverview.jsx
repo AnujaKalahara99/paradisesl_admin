@@ -1,60 +1,41 @@
 import React from "react";
-// import { Box } from "@adminjs/design-system";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Typography, Paper } from "@mui/material";
 
 const data = [
-  { name: "Pending", value: 400 },
-  { name: "Approved", value: 300 },
-  { name: "Rejected", value: 300 },
-  { name: "Under Review", value: 200 },
-  { name: "Flagged by Interpol", value: 100 },
+  { name: "Approved", value: 4 },
+  { name: "Pending", value: 10 },
+  { name: "Flagged", value: 3 },
+  { name: "Rejected", value: 1 },
 ];
 
-const COLORS = ["#004d99", "#009688", "#ff9800", "#ff5722", "#c62828"];
+const COLORS = [
+  "#8bc68a", // Muted Green
+  "#6ea8db", // Muted Blue
+  "#e5b676", // Muted Orange
+  "#e08b84", // Muted Red
+];
 
-const ApplicationStatusOverview = () => (
-  <Container
-    sx={{
-      bgcolor: "white",
-      height: 400,
-      padding: 2,
-      borderRadius: 2,
-      boxShadow: 3,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "flex-start",
-      alignItems: "center",
-    }}
-  >
-    <Typography
-      variant="h5"
-      align="center"
-      sx={{
-        fontWeight: "bold",
-        color: "#1976d2",
-        textTransform: "uppercase",
-        letterSpacing: 1,
-      }}
-    >
-      Application Status Overview
-    </Typography>
-    <Box
-      sx={{
-        width: "100%",
-        height: "80%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+const ApplicationStatusOverview = (props) => (
+  <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+    {console.log(`props ${props.data}`)}
+    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Typography
+        variant="h6"
+        align="center"
+        sx={{ fontWeight: "medium", color: "text.primary" }}
+      >
+        Application Status Overview
+      </Typography>
+    </Box>
+    <Box sx={{ width: "100%", height: 300 }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
-            data={data}
+            data={props.data}
             cx="50%"
             cy="50%"
-            labelLine={false}
+            // label={renderCustomizedLabel}
             outerRadius="80%"
             fill="#8884d8"
             dataKey="value"
@@ -70,7 +51,34 @@ const ApplicationStatusOverview = () => (
         </PieChart>
       </ResponsiveContainer>
     </Box>
-  </Container>
+  </Paper>
 );
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+    >
+      {data[index].name}
+    </text>
+  );
+};
 
 export default ApplicationStatusOverview;

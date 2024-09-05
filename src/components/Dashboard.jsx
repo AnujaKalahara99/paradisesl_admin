@@ -1,24 +1,27 @@
-import React from "react";
-// import { Box } from "@adminjs/design-system";
+import React, { useEffect, useState } from "react";
+import { ApiClient } from "adminjs";
 import ApplicationStatusOverview from "./dashboard/ApplicationStatusOverview";
-import { Grid2 as Grid, Paper, Box, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Grid2 as Grid, Box, Typography } from "@mui/material";
 import ApplicationVolumeByTime from "./dashboard/ApplicationVolumeByTime";
 import ApprovalRejectionRates from "./dashboard/ApprovalRejectionRates";
 import CountryOfOriginAnalysis from "./dashboard/CountryOfOriginAnalysis";
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-  ...theme.applyStyles("dark", {
-    backgroundColor: "#1A2027",
-  }),
-}));
-
 const Dashboard = (props) => {
+  const api = new ApiClient();
+
+  const [statusCounts, setStatusCounts] = useState([]);
+
+  useEffect(() => {
+    api
+      .getDashboard()
+      .then((response) => {
+        console.log(response.data.statusCounts);
+        setStatusCounts(response.data.statusCounts);
+      })
+      .catch((error) => {
+        // handle any errors
+      });
+  }, []);
   return (
     <Box>
       <Typography
@@ -37,7 +40,7 @@ const Dashboard = (props) => {
       </Typography>
       <Grid container spacing={4} padding={2}>
         <Grid size={4}>
-          <ApplicationStatusOverview />
+          <ApplicationStatusOverview data={statusCounts} />
         </Grid>
         <Grid size={8}>
           <ApplicationVolumeByTime />

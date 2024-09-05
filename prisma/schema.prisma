@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,10 +7,78 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model visa_application {
-  id          String   @id @default(cuid())
-  applicant   String
-  status      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model applicants {
+  applicant_id    Int      @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  age             Int
+  gender          String
+  occupation      String
+  current_location String
+
+  visa_applications visa_applications[]
+}
+
+model reviewers {
+  reviewer_id             Int      @id @default(autoincrement())
+  name                    String
+  assigned_applications    Int
+  average_review_time_days Int
+
+  visa_applications visa_applications[]
+}
+
+model visa_applications {
+  application_id       Int       @id @default(autoincrement())
+  applicant_id         Int
+  country_of_origin    String
+  application_date     DateTime
+  status               String
+  status_change_date   DateTime?
+  reviewer_id          Int
+  processing_time_days Int?
+  interpol_flag        Boolean
+
+  applicants  applicants  @relation(fields: [applicant_id], references: [applicant_id])
+  reviewers   reviewers   @relation(fields: [reviewer_id], references: [reviewer_id])
+  application_status_history application_status_history[]
+  security_alerts security_alerts?
+  visa_fees       visa_fees?
+  rejection_reasons rejection_reasons?
+}
+
+model application_status_history {
+  history_id    Int       @id @default(autoincrement())
+  application_id Int
+  status         String
+  status_date    DateTime
+
+  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+}
+
+model security_alerts {
+  alert_id         Int       @id @default(autoincrement())
+  application_id   Int       @unique  // Enforces one-to-one relationship
+  alert_type       String
+  alert_date       DateTime
+  resolution_status String
+  resolution_date  DateTime?
+
+  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+}
+
+model visa_fees {
+  application_id Int    @id  // Enforces one-to-one relationship
+  fee_amount     Float
+  payment_status String
+
+  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+}
+
+model rejection_reasons {
+  rejection_id    Int     @id @default(autoincrement())
+  application_id  Int     @unique  // Enforces one-to-one relationship
+  reason          String
+
+  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
 }
