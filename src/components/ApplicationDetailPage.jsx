@@ -10,30 +10,37 @@ import {
   CardMedia,
   TextField,
 } from "@mui/material";
+import { ApiClient } from "adminjs";
 
 const ApplicationDetailPage = ({ applicantId }) => {
-  const [applicant, setApplicant] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    dateOfBirth: "1990-01-01",
-    country: "United Stated of America",
-    email: "johndoe@example.com",
-    mobileNo: "1234567890",
-    photoUrl: "https://example.com/photo.jpg",
-  });
+  const api = new ApiClient();
 
-  //   useEffect(() => {
-  //     const fetchApplicant = async () => {
-  //       try {
-  //         const response = await axios.get(`/api/applicants/${applicantId}`);
-  //         setApplicant(response.data);
-  //       } catch (error) {
-  //         console.error('Error fetching applicant details:', error);
-  //       }
-  //     };
+  //   const [applicant, setApplicant] = useState({
+  //     firstName: "John",
+  //     lastName: "Doe",
+  //     dateOfBirth: "1990-01-01",
+  //     country: "United Stated of America",
+  //     email: "johndoe@example.com",
+  //     mobileNo: "1234567890",
+  //     photoUrl: "https://example.com/photo.jpg",
+  //   });
 
-  //     fetchApplicant();
-  //   }, [applicantId]);
+  const [applicants, setApplicants] = useState([]);
+  const [applicant, setApplicant] = useState(null);
+
+  useEffect(() => {
+    const fetchApplicant = async () => {
+      try {
+        const response = await axios.get(`/api/applicants`);
+        setApplicants(response.data);
+        setApplicant(response.data[0]);
+      } catch (error) {
+        console.error("Error fetching applicant details:", error);
+      }
+    };
+
+    fetchApplicant();
+  }, [applicantId]);
 
   const handleApprove = async () => {
     // try {
@@ -42,6 +49,18 @@ const ApplicationDetailPage = ({ applicantId }) => {
     // } catch (error) {
     //   console.error('Error approving application:', error);
     // }
+    try {
+      await axios.post(`/api/check`, {
+        firstName: applicant.givenName,
+        lastName: applicant.surname,
+        countryCode: "HT",
+        sex: "M",
+        applicantId: 1,
+      });
+      alert("Application approved.");
+    } catch (error) {
+      console.error("Error approving application:", error);
+    }
   };
 
   const handleReject = async () => {
@@ -58,63 +77,150 @@ const ApplicationDetailPage = ({ applicantId }) => {
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
-        Application Details
+        Applicant Details
       </Typography>
       <Card>
         <CardMedia
           component="img"
           height="300"
+          width="300"
           image={applicant.photoUrl}
-          alt={`${applicant.firstName} ${applicant.lastName}`}
+          alt={`${applicant.givenName} ${applicant.surname}`}
         />
         <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={2}>
               <TextField
                 fullWidth
                 label="Given Name"
-                value={applicant.firstName}
-                slotProps={{ input: { readOnly: true } }}
+                value={applicant.givenName}
+                InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
                 fullWidth
                 label="Surname"
-                value={applicant.lastName}
-                slotProps={{ input: { readOnly: true } }}
+                value={applicant.surname}
+                InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
                 fullWidth
                 label="Date of Birth"
                 value={new Date(applicant.dateOfBirth).toLocaleDateString()}
-                slotProps={{ input: { readOnly: true } }}
+                InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
                 fullWidth
                 label="Place of Birth"
-                value={applicant.country}
-                slotProps={{ input: { readOnly: true } }}
+                value={applicant.placeOfBirth}
+                InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
                 fullWidth
                 label="Email"
                 value={applicant.email}
-                slotProps={{ input: { readOnly: true } }}
+                InputProps={{ readOnly: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={4}>
               <TextField
                 fullWidth
                 label="Mobile No"
                 value={applicant.mobileNo}
-                slotProps={{ input: { readOnly: true } }}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Martial Status"
+                value={applicant.martialStatus}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Passport No"
+                value={applicant.passportNo}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Passport Expiry Date"
+                value={new Date(
+                  applicant.passportDateOfExpiry
+                ).toLocaleDateString()}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Place of Issue"
+                value={applicant.placeOfIssue}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Occupation"
+                value={applicant.occupation}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Home Address"
+                value={applicant.homeAddress}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Emergency Contact Name"
+                value={applicant.emergencyConName}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Emergency Contact No"
+                value={applicant.emergencyConNo}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Has Visited Before"
+                value={applicant.hasVisitedBefore ? "Yes" : "No"}
+                InputProps={{ readOnly: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                fullWidth
+                label="Last Visited Date"
+                value={
+                  applicant.lastVisitedDate
+                    ? new Date(applicant.lastVisitedDate).toLocaleDateString()
+                    : "N/A"
+                }
+                InputProps={{ readOnly: true }}
               />
             </Grid>
             {/* Add other fields as necessary */}

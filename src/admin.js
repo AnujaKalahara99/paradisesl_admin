@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
 import passwordsFeature from "@adminjs/passwords";
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 const componentLoader = new ComponentLoader();
 
@@ -28,38 +28,43 @@ export const authenticateHandler = async (email, password) => {
   return null;
 };
 
-const dashboardHandler = async () => {
-  const statusCountsData = await prisma.visa_applications.groupBy({
-    by: ["status"],
-    _count: {
-      status: true,
-    },
-  });
-  const dateVolumeData = await prisma.visa_applications.groupBy({
-    by: ["application_date"],
-    _count: {
-      application_id: true,
-    },
-    orderBy: {
-      application_date: "desc", // Order by date in descending order to get the latest dates first
-    },
-  });
-  if (dateVolumeData.length > 5) dateVolumeData = dateVolumeData.slice(0, 5);
-
-  const statusCounts = statusCountsData.map((e) => ({
-    name: e.status,
-    value: e._count.status,
-  }));
-
-  const dateVolume = dateVolumeData
-    .map((item, i) => ({
-      date: item.application_date.toISOString().split("T")[0], // Convert DateTime to "YYYY-MM-DD" format
-      applications: item._count.application_id, // Number of applications
-    }))
-    .reverse();
-
-  return { statusCounts, dateVolume };
+const applicationDetailHandler = async () => {
+  const applicants = await prisma.applicant.findFirst({});
+  return { applicants };
 };
+
+// const dashboardHandler = async () => {
+//   const statusCountsData = await prisma.visa_applications.groupBy({
+//     by: ["status"],
+//     _count: {
+//       status: true,
+//     },
+//   });
+//   const dateVolumeData = await prisma.visa_applications.groupBy({
+//     by: ["application_date"],
+//     _count: {
+//       application_id: true,
+//     },
+//     orderBy: {
+//       application_date: "desc", // Order by date in descending order to get the latest dates first
+//     },
+//   });
+//   if (dateVolumeData.length > 5) dateVolumeData = dateVolumeData.slice(0, 5);
+
+//   const statusCounts = statusCountsData.map((e) => ({
+//     name: e.status,
+//     value: e._count.status,
+//   }));
+
+//   const dateVolume = dateVolumeData
+//     .map((item, i) => ({
+//       date: item.application_date.toISOString().split("T")[0], // Convert DateTime to "YYYY-MM-DD" format
+//       applications: item._count.application_id, // Number of applications
+//     }))
+//     .reverse();
+
+//   return { statusCounts, dateVolume };
+// };
 
 const actions = {
   new: {
@@ -76,7 +81,7 @@ const actions = {
 export const adminOptions = {
   dashboard: {
     component: Components.Dashboard,
-    handler: dashboardHandler,
+    // handler: dashboardHandler,
   },
 
   pages: {
@@ -87,6 +92,7 @@ export const adminOptions = {
     applicationDetailPanel: {
       label: "Application Detail Page",
       component: Components.ApplicationDetailPage,
+      handler: applicationDetailHandler,
     },
   },
   componentLoader,
