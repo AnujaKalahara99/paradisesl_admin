@@ -6,7 +6,7 @@ import Connect from "connect-pg-simple";
 import session from "express-session";
 
 import { Database, Resource } from "@adminjs/prisma";
-import { adminOptions } from "./admin.js";
+import { adminOptions, authenticateHandler } from "./admin.js";
 
 AdminJS.registerAdapter({ Database, Resource });
 const PORT = 4000;
@@ -14,13 +14,6 @@ const PORT = 4000;
 const DEFAULT_ADMIN = {
   email: "admin@example.com",
   password: "password",
-};
-
-const authenticate = async (email, password) => {
-  if (email === DEFAULT_ADMIN.email && password === DEFAULT_ADMIN.password) {
-    return Promise.resolve(DEFAULT_ADMIN);
-  }
-  return null;
 };
 
 const start = async () => {
@@ -42,7 +35,7 @@ const start = async () => {
   const adminRouter = AdminJSExpress.buildAuthenticatedRouter(
     admin,
     {
-      authenticate,
+      authenticate: authenticateHandler,
       cookieName: "adminjs",
       cookiePassword: "sessionsecret",
     },
@@ -59,6 +52,8 @@ const start = async () => {
       name: "adminjs",
     }
   );
+
+  // const adminRouter = AdminJSExpress.buildRouter(admin);
 
   app.use(admin.options.rootPath, adminRouter);
 

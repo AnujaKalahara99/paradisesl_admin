@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Applicant {
-  applicantId                             Int              @id @default(autoincrement())
+  applicantId                             Int                 @id @default(autoincrement())
   reviewedId                              Int?
   applliedDate                            DateTime            @db.Date
   completedDate                           DateTime?           @db.Date
@@ -51,7 +51,7 @@ model Applicant {
 }
 
 model ApplicantEntity {
-  entityId      Int         @id @default(autoincrement())
+  entityId      Int            @id @default(autoincrement())
   userId        Int?
   mainApplicant Int?
   visaSubCat    String?
@@ -103,9 +103,10 @@ model Employee {
   employeeId  Int         @id @default(autoincrement())
   firstName   String
   lastName    String
-  password    String 
+  password    String
   nic         String
   position    String
+  email       String      @unique
   isAdmin     Boolean
   dateOfBirth DateTime    @db.Date
   Applicant   Applicant[]
@@ -191,4 +192,12 @@ model VisaType {
   extensionDetails    String
   ApplicantEntity     ApplicantEntity[]
   VisaCountryGroupFee VisaCountryGroupFee[]
+}
+
+model session {
+  sid    String   @id @db.VarChar
+  sess   Json     @db.Json
+  expire DateTime @db.Timestamp(6)
+
+  @@index([expire], map: "IDX_session_expire")
 }

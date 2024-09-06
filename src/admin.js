@@ -1,6 +1,8 @@
 import { ComponentLoader } from "adminjs";
 import { getModelByName } from "@adminjs/prisma";
 import { PrismaClient } from "@prisma/client";
+import argon2 from "argon2";
+import passwordsFeature from "@adminjs/passwords";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +11,21 @@ const componentLoader = new ComponentLoader();
 const Components = {
   Dashboard: componentLoader.add("Dashboard", "./components/Dashboard"),
   CustomPanel: componentLoader.add("CustomPanel", "./components/CustomPanel"),
+  ApplicationDetailPage: componentLoader.add(
+    "ApplicationDetailPage",
+    "./components/ApplicationDetailPage"
+  ),
+};
+
+export const authenticateHandler = async (email, password) => {
+  const employee = await prisma.employee.findUnique({
+    where: { email },
+  });
+
+  if (employee && (await argon2.verify(employee.password, password))) {
+    return Promise.resolve(employee);
+  }
+  return null;
 };
 
 const dashboardHandler = async () => {
@@ -44,6 +61,18 @@ const dashboardHandler = async () => {
   return { statusCounts, dateVolume };
 };
 
+const actions = {
+  new: {
+    isAccessible: ({ currentAdmin }) => currentAdmin?.isAdmin, // Allow create only if admin
+  },
+  edit: {
+    isAccessible: ({ currentAdmin }) => currentAdmin?.isAdmin, // Allow edit only if admin
+  },
+  delete: {
+    isAccessible: ({ currentAdmin }) => currentAdmin?.isAdmin, // Allow delete only if admin
+  },
+};
+
 export const adminOptions = {
   dashboard: {
     component: Components.Dashboard,
@@ -54,6 +83,10 @@ export const adminOptions = {
     customPanel: {
       label: "Custom Panel",
       component: Components.CustomPanel,
+    },
+    applicationDetailPanel: {
+      label: "Application Detail Page",
+      component: Components.ApplicationDetailPage,
     },
   },
   componentLoader,
@@ -74,78 +107,100 @@ export const adminOptions = {
       resource: {
         model: getModelByName("Country"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("CountryGroup"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("CountryGroupMember"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("Employee"),
         client: prisma,
+        actions: actions,
       },
+      options: {
+        properties: { password: { isVisible: false } },
+      },
+      features: [
+        passwordsFeature({
+          componentLoader,
+          properties: { password: "Password", encryptedPassword: "password" },
+          hash: argon2.hash,
+        }),
+      ],
     },
     {
       resource: {
         model: getModelByName("EntityMember"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("FreeVisaCountry"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("PastTravelDetails"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("RefreshTokens"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("User"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("UserCred"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("VisaCountryGroupFee"),
         client: prisma,
+        actions,
       },
     },
     {
       resource: {
         model: getModelByName("VisaType"),
         client: prisma,
+        actions,
       },
     },
   ],
   branding: {
     companyName: "Visa Application Admin",
-    logo: "https://picsum.photos/200/300",
+    logo: "https://i.imgur.com/km8pyQx.png",
     softwareBrothers: false,
   },
 };

@@ -49,6 +49,11 @@
   resolved "https://registry.npmjs.org/@adminjs/express/-/express-6.1.0.tgz"
   integrity sha512-B3yoWGSp8xeqS/geBIKoSnMx46tbYYrbb/EmKD0SqqlVfxtBwgyoTWa6pkxqRc2T4iTMOl84VkMT0axnooAmZA==
 
+"@adminjs/passwords@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@adminjs/passwords/-/passwords-4.0.0.tgz"
+  integrity sha512-lkN3r7zMKAcSUg1TGSbvywoNDZmwuPsmcVufIlNJm4ZGHWImVyFAG2vEspmzCyYPR6seFKx3BuLxsW93x+CRwg==
+
 "@adminjs/prisma@^5.0.3":
   version "5.0.3"
   resolved "https://registry.npmjs.org/@adminjs/prisma/-/prisma-5.0.3.tgz"
