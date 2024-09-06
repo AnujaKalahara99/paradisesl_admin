@@ -10,13 +10,15 @@ const Dashboard = (props) => {
   const api = new ApiClient();
 
   const [statusCounts, setStatusCounts] = useState([]);
+  const [dateVolume, setDateVolume] = useState([]);
 
   useEffect(() => {
     api
       .getDashboard()
       .then((response) => {
-        console.log(response.data.statusCounts);
+        console.log(response.data);
         setStatusCounts(response.data.statusCounts);
+        setDateVolume(response.data.dateVolume);
       })
       .catch((error) => {
         // handle any errors
@@ -38,12 +40,12 @@ const Dashboard = (props) => {
       >
         Online Sri Lanka Visa Portal
       </Typography>
-      <Grid container spacing={4} padding={2}>
+      <Grid container spacing={2} padding={2}>
         <Grid size={4}>
           <ApplicationStatusOverview data={statusCounts} />
         </Grid>
         <Grid size={8}>
-          <ApplicationVolumeByTime />
+          <ApplicationVolumeByTime data={dateVolume} />
         </Grid>
         <Grid size={8}>
           <ApprovalRejectionRates />

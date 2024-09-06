@@ -12,19 +12,36 @@ const Components = {
 };
 
 const dashboardHandler = async () => {
-  // Asynchronous code where you, e. g. fetch data from your database
   const statusCountsData = await prisma.visa_applications.groupBy({
-    by: ["status"], // Group by the 'status' field
+    by: ["status"],
     _count: {
-      status: true, // Count the number of records for each status
+      status: true,
     },
   });
+  const dateVolumeData = await prisma.visa_applications.groupBy({
+    by: ["application_date"],
+    _count: {
+      application_id: true,
+    },
+    orderBy: {
+      application_date: "desc", // Order by date in descending order to get the latest dates first
+    },
+  });
+  if (dateVolumeData.length > 5) dateVolumeData = dateVolumeData.slice(0, 5);
+
   const statusCounts = statusCountsData.map((e) => ({
     name: e.status,
     value: e._count.status,
   }));
 
-  return { statusCounts };
+  const dateVolume = dateVolumeData
+    .map((item, i) => ({
+      date: item.application_date.toISOString().split("T")[0], // Convert DateTime to "YYYY-MM-DD" format
+      applications: item._count.application_id, // Number of applications
+    }))
+    .reverse();
+
+  return { statusCounts, dateVolume };
 };
 
 export const adminOptions = {

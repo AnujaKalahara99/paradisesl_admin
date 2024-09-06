@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography, Box } from "@mui/material";
+import { Box, Typography, Paper } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -19,37 +19,30 @@ const data = [
 const COLORS = ["#004d99", "#ff5722"]; // Refined color palette
 
 const ApprovalRejectionRates = () => (
-  <Container
-    sx={{
-      bgcolor: "white",
-      padding: 2,
-      borderRadius: 2,
-      boxShadow: 3,
-      height: 400,
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    }}
-  >
-    <Typography
-      variant="h5"
-      align="center"
-      sx={{
-        fontWeight: "bold",
-        color: "#004d99", // Primary color for the title
-        marginBottom: 2, // Adds spacing below the title
-        textTransform: "uppercase", // Makes the text uppercase
-        letterSpacing: 1, // Adds space between letters
-      }}
-    >
-      Approval Rejection Rates
-    </Typography>
-    <Box sx={{ width: "100%", height: "100%" }}>
+  <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+      <Typography
+        variant="h6"
+        align="center"
+        sx={{
+          fontWeight: "medium",
+          color: "text.primary",
+          textTransform: "uppercase", // Makes the text uppercase
+          letterSpacing: 1, // Adds space between letters
+        }}
+      >
+        Approval Rejection Rates
+      </Typography>
+    </Box>
+    <Box sx={{ width: "100%", height: 300 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
+        <BarChart
+          data={data}
+          layout="vertical" // Switches the chart to horizontal layout
+        >
           <CartesianGrid stroke="#f5f5f5" strokeDasharray="5 5" />
-          <XAxis dataKey="name" tick={{ fill: "#555555" }} />
-          <YAxis tick={{ fill: "#555555" }} />
+          <XAxis type="number" tick={{ fill: "#555555" }} />
+          <YAxis dataKey="name" type="category" tick={{ fill: "#555555" }} />
           <Tooltip />
           <Legend />
           <Bar
@@ -57,10 +50,15 @@ const ApprovalRejectionRates = () => (
             fill={COLORS[0]} // Color for 'Approved'
             barSize={30}
           />
+          <Bar
+            dataKey="count"
+            fill={COLORS[1]} // Color for 'Rejected'
+            barSize={30}
+          />
         </BarChart>
       </ResponsiveContainer>
     </Box>
-  </Container>
+  </Paper>
 );
 
 export default ApprovalRejectionRates;
