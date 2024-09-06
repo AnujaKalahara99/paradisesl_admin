@@ -60,43 +60,85 @@ export const adminOptions = {
   resources: [
     {
       resource: {
-        model: getModelByName("visa_applications"),
+        model: getModelByName("Applicant"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("applicants"),
+        model: getModelByName("ApplicantEntity"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("reviewers"),
+        model: getModelByName("Country"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("application_status_history"),
+        model: getModelByName("CountryGroup"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("security_alerts"),
+        model: getModelByName("CountryGroupMember"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("visa_fees"),
+        model: getModelByName("Employee"),
         client: prisma,
       },
     },
     {
       resource: {
-        model: getModelByName("rejection_reasons"),
+        model: getModelByName("EntityMember"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("FreeVisaCountry"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("PastTravelDetails"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("RefreshTokens"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("User"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("UserCred"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("VisaCountryGroupFee"),
+        client: prisma,
+      },
+    },
+    {
+      resource: {
+        model: getModelByName("VisaType"),
         client: prisma,
       },
     },

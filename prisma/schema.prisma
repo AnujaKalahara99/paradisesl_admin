@@ -3,82 +3,192 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model applicants {
-  applicant_id    Int      @id @default(autoincrement())
-  first_name      String
-  last_name       String
-  age             Int
-  gender          String
-  occupation      String
-  current_location String
-
-  visa_applications visa_applications[]
+model Applicant {
+  applicantId                             Int              @id @default(autoincrement())
+  reviewedId                              Int?
+  applliedDate                            DateTime            @db.Date
+  completedDate                           DateTime?           @db.Date
+  status                                  String
+  reasonForReeject                        String?
+  givenName                               String
+  surname                                 String
+  dateOfBirth                             DateTime            @db.Date
+  placeOfBirth                            String
+  martialStatus                           String
+  photoUrl                                String
+  gender                                  String
+  passportNo                              String
+  passportDateOfExpiry                    DateTime            @db.Date
+  passportUrl                             String
+  placeOfIssue                            String
+  occupation                              String
+  email                                   String
+  mobileCountryCode                       String
+  mobileNo                                String
+  whatsappCountryCode                     String
+  whatsappNo                              String
+  homeAddress                             String
+  emergencyConName                        String
+  emergencyConCountryCode                 String
+  emergencyConNo                          String
+  hasVisitedBefore                        Boolean
+  lastVisitedDate                         DateTime?           @db.Date
+  accomodationUrl                         String?
+  returnTicketUrl                         String?
+  facebookUrl                             String?
+  instagramUrl                            String?
+  xUrl                                    String?
+  Country_Applicant_placeOfBirthToCountry Country             @relation("Applicant_placeOfBirthToCountry", fields: [placeOfBirth], references: [countryId], onDelete: NoAction, onUpdate: NoAction)
+  Country_Applicant_placeOfIssueToCountry Country             @relation("Applicant_placeOfIssueToCountry", fields: [placeOfIssue], references: [countryId], onDelete: NoAction, onUpdate: NoAction)
+  Employee                                Employee?           @relation(fields: [reviewedId], references: [employeeId], onDelete: NoAction, onUpdate: NoAction)
+  ApplicantEntity                         ApplicantEntity[]
+  EntityMember                            EntityMember[]
+  PastTravelDetails                       PastTravelDetails[]
 }
 
-model reviewers {
-  reviewer_id             Int      @id @default(autoincrement())
-  name                    String
-  assigned_applications    Int
-  average_review_time_days Int
-
-  visa_applications visa_applications[]
+model ApplicantEntity {
+  entityId      Int         @id @default(autoincrement())
+  userId        Int?
+  mainApplicant Int?
+  visaSubCat    String?
+  countryId     String?
+  purpose       String
+  startDate     String
+  endDate       String
+  placeOfStay   String?
+  addressOfStay String?
+  cityOfStay    String?
+  zipOfStay     String?
+  Country       Country?       @relation(fields: [countryId], references: [countryId], onDelete: NoAction, onUpdate: NoAction)
+  Applicant     Applicant?     @relation(fields: [mainApplicant], references: [applicantId], onDelete: NoAction, onUpdate: NoAction)
+  User          User?          @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  VisaType      VisaType?      @relation(fields: [visaSubCat], references: [visaId], onDelete: NoAction, onUpdate: NoAction)
+  EntityMember  EntityMember[]
 }
 
-model visa_applications {
-  application_id       Int       @id @default(autoincrement())
-  applicant_id         Int
-  country_of_origin    String
-  application_date     DateTime
-  status               String
-  status_change_date   DateTime?
-  reviewer_id          Int
-  processing_time_days Int?
-  interpol_flag        Boolean
-
-  applicants  applicants  @relation(fields: [applicant_id], references: [applicant_id])
-  reviewers   reviewers   @relation(fields: [reviewer_id], references: [reviewer_id])
-  application_status_history application_status_history[]
-  security_alerts security_alerts?
-  visa_fees       visa_fees?
-  rejection_reasons rejection_reasons?
+model Country {
+  countryId                                 String               @id
+  name                                      String
+  countryCode                               String
+  nationality                               String
+  Applicant_Applicant_placeOfBirthToCountry Applicant[]          @relation("Applicant_placeOfBirthToCountry")
+  Applicant_Applicant_placeOfIssueToCountry Applicant[]          @relation("Applicant_placeOfIssueToCountry")
+  ApplicantEntity                           ApplicantEntity[]
+  CountryGroupMember                        CountryGroupMember[]
+  PastTravelDetails                         PastTravelDetails[]
 }
 
-model application_status_history {
-  history_id    Int       @id @default(autoincrement())
-  application_id Int
-  status         String
-  status_date    DateTime
-
-  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+model CountryGroup {
+  countryGrpId        Int                   @id @default(autoincrement())
+  title               String
+  description         String
+  CountryGroupMember  CountryGroupMember[]
+  VisaCountryGroupFee VisaCountryGroupFee[]
 }
 
-model security_alerts {
-  alert_id         Int       @id @default(autoincrement())
-  application_id   Int       @unique  // Enforces one-to-one relationship
-  alert_type       String
-  alert_date       DateTime
-  resolution_status String
-  resolution_date  DateTime?
+model CountryGroupMember {
+  countryGrpId Int
+  countryId    String
+  CountryGroup CountryGroup @relation(fields: [countryGrpId], references: [countryGrpId], onDelete: NoAction, onUpdate: NoAction)
+  Country      Country      @relation(fields: [countryId], references: [countryId], onDelete: NoAction, onUpdate: NoAction)
 
-  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+  @@id([countryGrpId, countryId])
 }
 
-model visa_fees {
-  application_id Int    @id  // Enforces one-to-one relationship
-  fee_amount     Float
-  payment_status String
-
-  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+model Employee {
+  employeeId  Int         @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  password    String 
+  nic         String
+  position    String
+  isAdmin     Boolean
+  dateOfBirth DateTime    @db.Date
+  Applicant   Applicant[]
 }
 
-model rejection_reasons {
-  rejection_id    Int     @id @default(autoincrement())
-  application_id  Int     @unique  // Enforces one-to-one relationship
-  reason          String
+model EntityMember {
+  entityId        Int
+  applicantId     Int
+  relation        String?
+  Applicant       Applicant       @relation(fields: [applicantId], references: [applicantId], onDelete: NoAction, onUpdate: NoAction)
+  ApplicantEntity ApplicantEntity @relation(fields: [entityId], references: [entityId], onDelete: NoAction, onUpdate: NoAction)
 
-  visa_applications visa_applications @relation(fields: [application_id], references: [application_id])
+  @@id([entityId, applicantId])
+}
+
+model FreeVisaCountry {
+  countryId  String
+  visaTypeId String
+
+  @@id([countryId, visaTypeId])
+}
+
+model PastTravelDetails {
+  applicantId        Int
+  destinationCountry String
+  visitedDate        DateTime  @db.Date
+  proofUrl           String
+  purpose            String?
+  Applicant          Applicant @relation(fields: [applicantId], references: [applicantId], onDelete: NoAction, onUpdate: NoAction)
+  Country            Country   @relation(fields: [destinationCountry], references: [countryId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([applicantId, destinationCountry, visitedDate])
+}
+
+model RefreshTokens {
+  token     String    @id
+  createdAt DateTime? @db.Date
+  userId    Int?
+  UserCred  UserCred? @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "RefreshTokens_fkey")
+
+  @@index([userId], map: "fki_s")
+}
+
+model User {
+  userId          Int               @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  email           String
+  countryCode     String?
+  contactNo       String?
+  countryId       String?
+  ApplicantEntity ApplicantEntity[]
+  UserCred        UserCred          @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model UserCred {
+  userId        Int             @id(map: "userCredPrimary") @default(autoincrement())
+  email         String          @unique(map: "emailUnique")
+  password      String
+  RefreshTokens RefreshTokens[]
+  User          User?
+}
+
+model VisaCountryGroupFee {
+  subCatId     String
+  countryGrpId Int
+  fee          Decimal?     @db.Decimal(10, 2)
+  CountryGroup CountryGroup @relation(fields: [countryGrpId], references: [countryGrpId], onDelete: NoAction, onUpdate: NoAction)
+  VisaType     VisaType     @relation(fields: [subCatId], references: [visaId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([subCatId, countryGrpId])
+}
+
+model VisaType {
+  visaId              String                @id
+  title               String
+  entryType           String
+  baseFee             Decimal               @db.Decimal(10, 2)
+  description         String
+  multiEntryLimitDays Int?
+  period              String
+  duration            Int
+  extensionDetails    String
+  ApplicantEntity     ApplicantEntity[]
+  VisaCountryGroupFee VisaCountryGroupFee[]
 }
